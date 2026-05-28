@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutri VES - Inicio</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="login-box">
+    <div class="login-header">
+      <div class="logo">Nutri VES</div>
+      <p class="login-subtitle">Sistema de Gestión Clínica</p>
+    </div>
+    <form method="POST" class="login-form">
+      <div class="form-group">
+        <label for="name">Nombre del Nutriólogo</label>
+        <input type="text" id="name" name="name" placeholder="Escribe tu nombre" required autofocus>
+      </div>
+      <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
+      <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
+    </form>
+  </div>
+</body>
+</html>

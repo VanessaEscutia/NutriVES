@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutri VES - Consulta: <%= patient.name %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/dashboard" class="nav-brand">Nutri VES</a>
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link">Pacientes</a>
+        <a href="/register" class="nav-link">Registrar Paciente</a>
+        <span class="nav-user"><%= typeof nutriologo !== 'undefined' ? nutriologo : '' %></span>
+        <a href="/logout" class="nav-link nav-logout">Cerrar Sesión</a>
+      </div>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="patient-header">
+      <div class="patient-info">
+        <h1><%= patient.name %></h1>
+        <div class="patient-meta">
+          <span>Edad: <%= patient.age %> años</span>
+          <span>Peso: <%= patient.weight %> kg</span>
+          <span>Altura: <%= patient.height %> cm</span>
+          <span>IMC: <strong><%= patient.bmi %></strong></span>
+          <span class="diagnosis diagnosis-<%= patient.diagnosis === 'Bajo Peso' ? 'bajo' : patient.diagnosis === 'Peso Normal' ? 'normal' : patient.diagnosis === 'Sobrepeso' ? 'sobre' : 'obesidad' %>"><%= patient.diagnosis %></span>
+        </div>
+      </div>
+      <a href="/dashboard" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <div class="consultation-layout">
+      <div class="consultation-form-card">
+        <h2>Nueva Consulta</h2>
+        <form method="POST" class="form">
+          <div class="form-group">
+            <label for="evolution">Evolución del Paciente</label>
+            <textarea id="evolution" name="evolution" rows="4" placeholder="Describe la evolución del paciente..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="diet_plan">Plan de Alimentación</label>
+            <textarea id="diet_plan" name="diet_plan" rows="4" placeholder="Describe el plan de alimentación..." required></textarea>
+          </div>
+          <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
+          <button type="submit" class="btn btn-primary btn-full">Guardar Consulta</button>
+        </form>
+      </div>
+
+      <div class="history-card">
+        <h2>Historial de Consultas</h2>
+        <div id="consultationsList" class="consultations-list">
+          <% if (consultations.length) { %>
+            <% consultations.forEach(c => { %>
+            <div class="consultation-entry">
+              <div class="entry-header">
+                <span class="entry-date"><%= c.date %> <%= c.time %></span>
+                <span class="entry-doctor">Atendió: <%= c.nutriologo %></span>
+              </div>
+              <div class="entry-body">
+                <div class="entry-section"><strong>Evolución:</strong><p><%= c.evolution %></p></div>
+                <div class="entry-section"><strong>Plan de Alimentación:</strong><p><%= c.diet_plan %></p></div>
+              </div>
+            </div>
+            <% }) %>
+          <% } else { %>
+            <p class="empty-text">No hay consultas registradas para este paciente.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    const patientId = <%= patient.id %>;
+    function loadConsultations() {
+      fetch('/api/patient/' + patientId + '/consultations')
+        .then(r => r.json())
+        .then(data => {
+          const container = document.getElementById('consultationsList');
+          if (data.length === 0) {
+            container.innerHTML = '<p class="empty-text">No hay consultas registradas para este paciente.</p>';
+            return;
+          }
+          container.innerHTML = data.map(c =>
+            `<div class="consultation-entry">
+              <div class="entry-header">
+                <span class="entry-date">${c.date} ${c.time}</span>
+                <span class="entry-doctor">Atendió: ${c.nutriologo}</span>
+              </div>
+              <div class="entry-body">
+                <div class="entry-section"><strong>Evolución:</strong><p>${c.evolution}</p></div>
+                <div class="entry-section"><strong>Plan de Alimentación:</strong><p>${c.diet_plan}</p></div>
+              </div>
+            </div>`
+          ).join('');
+        })
+        .catch(() => {});
+    }
+    setInterval(loadConsultations, 5000);
+  </script>
+</body>
+</html>

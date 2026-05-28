@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "patient_id": 2,
+    "date": "2026-05-28",
+    "time": "17:40:55",
+    "evolution": "mucho peso",
+    "diet_plan": "menos dulces",
+    "nutriologo": "Vanessa",
+    "created_at": "2026-05-28 17:40:55"
+  },
+  {
+    "id": 2,
+    "patient_id": 1,
+    "date": "2026-05-28",
+    "time": "17:41:16",
+    "evolution": "pesa mucho",
+    "diet_plan": "menos tamales",
+    "nutriologo": "Vanessa",
+    "created_at": "2026-05-28 17:41:16"
+  },
+  {
+    "id": 3,
+    "patient_id": 1,
+    "date": "2026-05-28",
+    "time": "17:41:52",
+    "evolution": "ya pesa menos",
+    "diet_plan": "puede comer tamales",
+    "nutriologo": "Vanessa",
+    "created_at": "2026-05-28 17:41:52"
+  },
+  {
+    "id": 4,
+    "patient_id": 2,
+    "date": "2026-05-28",
+    "time": "17:42:25",
+    "evolution": "ahora pesa muy poco",
+    "diet_plan": "más comida",
+    "nutriologo": "Vanessa",
+    "created_at": "2026-05-28 17:42:25"
+  },
+  {
+    "id": 5,
+    "patient_id": 2,
+    "date": "2026-05-28",
+    "time": "17:42:46",
+    "evolution": "peso saludable",
+    "diet_plan": "mantener su alimentación",
+    "nutriologo": "Vanessa",
+    "created_at": "2026-05-28 17:42:46"
+  }
+]

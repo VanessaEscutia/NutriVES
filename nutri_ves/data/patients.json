@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "name": "Ana Lupe Editada",
+    "weight": 72.5,
+    "height": 165,
+    "age": 46,
+    "bmi": 26.63,
+    "diagnosis": "Sobrepeso",
+    "created_at": "2026-05-28 17:38:44",
+    "registered_by": "Doctor"
+  },
+  {
+    "id": 2,
+    "name": "Alondra Rosas Torres",
+    "weight": 25,
+    "height": 100,
+    "age": 4,
+    "bmi": 25,
+    "diagnosis": "Sobrepeso",
+    "created_at": "2026-05-28 17:39:49",
+    "registered_by": "Vanessa"
+  }
+]

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutri VES - Registrar Paciente</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/dashboard" class="nav-brand">Nutri VES</a>
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link">Pacientes</a>
+        <a href="/register" class="nav-link">Registrar Paciente</a>
+        <span class="nav-user"><%= typeof nutriologo !== 'undefined' ? nutriologo : '' %></span>
+        <a href="/logout" class="nav-link nav-logout">Cerrar Sesión</a>
+      </div>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="form-card">
+      <h1>Registro Antropométrico</h1>
+      <p class="form-subtitle">Captura los datos del paciente. El IMC y diagnóstico se calcularán automáticamente.</p>
+      <form method="POST" class="form" id="registerForm">
+        <div class="form-group">
+          <label for="name">Nombre Completo</label>
+          <input type="text" id="name" name="name" placeholder="Nombre del paciente" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="weight">Peso (kg)</label>
+            <input type="number" id="weight" name="weight" step="0.1" min="1" max="500" placeholder="70.5" required>
+          </div>
+          <div class="form-group">
+            <label for="height">Altura (cm)</label>
+            <input type="number" id="height" name="height" step="0.1" min="50" max="250" placeholder="170" required>
+          </div>
+          <div class="form-group">
+            <label for="age">Edad</label>
+            <input type="number" id="age" name="age" min="0" max="150" placeholder="30" required>
+          </div>
+        </div>
+        <div class="bmi-preview" id="bmiPreview" style="display:none;">
+          <div class="bmi-value">IMC: <span id="bmiValue">--</span></div>
+          <div class="bmi-diagnosis">Diagnóstico: <span id="bmiDiagnosis">--</span></div>
+        </div>
+        <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
+        <button type="submit" class="btn btn-primary btn-full">Guardar Paciente</button>
+      </form>
+    </div>
+  </main>
+  <script>
+    const w = document.getElementById('weight');
+    const h = document.getElementById('height');
+    const preview = document.getElementById('bmiPreview');
+    const bmiVal = document.getElementById('bmiValue');
+    const bmiDiag = document.getElementById('bmiDiagnosis');
+
+    function calc(wv, hv) {
+      if (wv > 0 && hv > 0) {
+        const m = hv / 100;
+        return Math.round((wv / (m * m)) * 100) / 100;
+      }
+      return null;
+    }
+    function diag(b) {
+      if (b === null) return '--';
+      if (b < 18.5) return 'Bajo Peso';
+      if (b < 25) return 'Peso Normal';
+      if (b < 30) return 'Sobrepeso';
+      return 'Obesidad';
+    }
+    function update() {
+      const b = calc(parseFloat(w.value), parseFloat(h.value));
+      if (b !== null) {
+        preview.style.display = 'flex';
+        bmiVal.textContent = b;
+        bmiDiag.textContent = diag(b);
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+    w.addEventListener('input', update);
+    h.addEventListener('input', update);
+  </script>
+</body>
+</html>
