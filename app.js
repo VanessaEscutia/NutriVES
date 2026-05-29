@@ -555,22 +555,27 @@ function renderPatientDetailPage(patientId, errorMessage) {
     renderPatientDetailPage(patientId);
   });
 
-  // attach edit/delete handlers to each consult entry
-  document.querySelectorAll('.btn-edit-consult').forEach(btn => {
-    btn.addEventListener('click', () => openConsultEditModal(btn.dataset.id));
-  });
-
-  document.querySelectorAll('.btn-delete-consult').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cid = Number(btn.dataset.id);
-      if (!confirm('¿Eliminar esta consulta? Esta acción no se puede deshacer.')) return;
-      const idx = state.consultations.findIndex(x => x.id === cid);
-      if (idx === -1) return alert('Consulta no encontrada.');
-      state.consultations.splice(idx, 1);
-      saveState();
-      renderPatientDetailPage(patientId);
+  // attach edit/delete handlers using event delegation (more reliable)
+  const consultationsListEl = document.getElementById('consultationsList');
+  if (consultationsListEl) {
+    consultationsListEl.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('.btn-edit-consult, .btn-delete-consult');
+      if (!btn) return;
+      if (btn.classList.contains('btn-edit-consult')) {
+        openConsultEditModal(btn.dataset.id);
+        return;
+      }
+      if (btn.classList.contains('btn-delete-consult')) {
+        const cid = Number(btn.dataset.id);
+        if (!confirm('¿Eliminar esta consulta? Esta acción no se puede deshacer.')) return;
+        const idx = state.consultations.findIndex(x => x.id === cid);
+        if (idx === -1) return alert('Consulta no encontrada.');
+        state.consultations.splice(idx, 1);
+        saveState();
+        renderPatientDetailPage(patientId);
+      }
     });
-  });
+  }
 }
 
 function renderNotFoundPage() {
