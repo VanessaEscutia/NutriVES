@@ -430,7 +430,7 @@ function renderPatientDetailPage(patientId, errorMessage) {
           <h2>Historial de Consultas</h2>
           <div id="consultationsList" class="consultations-list">
             ${consultations.length > 0 ? consultations.map(c => `
-              <div class="consultation-entry">
+              <div class="consultation-entry" data-consult-id="${c.id}">
                 <div class="entry-header">
                   <span class="entry-date">${c.date} ${c.time}</span>
                   <span class="entry-doctor">Atendió: ${escapeHTML(c.nutriologo)}</span>
@@ -438,6 +438,10 @@ function renderPatientDetailPage(patientId, errorMessage) {
                 <div class="entry-body">
                   <div class="entry-section"><strong>Evolución:</strong><p>${escapeHTML(c.evolution)}</p></div>
                   <div class="entry-section"><strong>Plan de Alimentación:</strong><p>${escapeHTML(c.diet_plan)}</p></div>
+                </div>
+                <div class="entry-actions" style="margin-top:8px; display:flex; gap:.5rem;">
+                  <button class="btn btn-sm btn-secondary btn-edit-consult" data-id="${c.id}">Editar</button>
+                  <button class="btn btn-sm btn-secondary btn-delete-consult" data-id="${c.id}">Eliminar</button>
                 </div>
               </div>
             `).join('') : '<p class="empty-text">No hay consultas registradas para este paciente.</p>'}
@@ -473,6 +477,99 @@ function renderPatientDetailPage(patientId, errorMessage) {
 
     saveState();
     renderPatientDetailPage(patientId);
+  });
+
+  // Consultation edit modal markup and handlers
+  const consultModalHtml = `
+    <div id="consultEditModal" class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Editar Consulta</h2>
+          <span id="closeConsultModal" class="modal-close">&times;</span>
+        </div>
+        <form id="consultEditForm">
+          <input type="hidden" id="consultEditId" name="id">
+          <div class="form-group">
+            <label for="consultEditEvolution">Evolución</label>
+            <textarea id="consultEditEvolution" name="evolution" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="consultEditDiet">Plan de Alimentación</label>
+            <textarea id="consultEditDiet" name="diet_plan" rows="4" required></textarea>
+          </div>
+          <div id="consultEditError" class="error-msg" style="display:none;"></div>
+          <button type="submit" class="btn btn-primary btn-full">Guardar Consulta</button>
+        </form>
+      </div>
+    </div>
+  `;
+
+  // append modal to root for access
+  root.insertAdjacentHTML('beforeend', consultModalHtml);
+
+  const consultEditModal = document.getElementById('consultEditModal');
+  const closeConsultModal = document.getElementById('closeConsultModal');
+  const consultEditForm = document.getElementById('consultEditForm');
+  const consultEditId = document.getElementById('consultEditId');
+  const consultEditEvolution = document.getElementById('consultEditEvolution');
+  const consultEditDiet = document.getElementById('consultEditDiet');
+  const consultEditError = document.getElementById('consultEditError');
+
+  function openConsultEditModal(consultId) {
+    const consult = state.consultations.find(x => x.id === Number(consultId));
+    if (!consult) return;
+    consultEditId.value = consult.id;
+    consultEditEvolution.value = consult.evolution;
+    consultEditDiet.value = consult.diet_plan;
+    consultEditError.style.display = 'none';
+    consultModalShow();
+  }
+
+  function consultModalShow() { consultEditModal.style.display = 'flex'; }
+  function consultModalHide() { consultEditModal.style.display = 'none'; consultEditError.style.display = 'none'; }
+
+  closeConsultModal.addEventListener('click', consultModalHide);
+  consultEditModal.addEventListener('click', e => { if (e.target === consultEditModal) consultModalHide(); });
+
+  consultEditForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = Number(consultEditId.value);
+    const evolution = consultEditEvolution.value.trim();
+    const diet = consultEditDiet.value.trim();
+    if (!evolution || !diet) {
+      consultEditError.textContent = 'Debes capturar evolución y plan de alimentación.';
+      consultEditError.style.display = 'block';
+      return;
+    }
+    const idx = state.consultations.findIndex(x => x.id === id);
+    if (idx === -1) {
+      consultEditError.textContent = 'Consulta no encontrada.';
+      consultEditError.style.display = 'block';
+      return;
+    }
+    state.consultations[idx].evolution = evolution;
+    state.consultations[idx].diet_plan = diet;
+    // keep original timestamps
+    saveState();
+    consultModalHide();
+    renderPatientDetailPage(patientId);
+  });
+
+  // attach edit/delete handlers to each consult entry
+  document.querySelectorAll('.btn-edit-consult').forEach(btn => {
+    btn.addEventListener('click', () => openConsultEditModal(btn.dataset.id));
+  });
+
+  document.querySelectorAll('.btn-delete-consult').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cid = Number(btn.dataset.id);
+      if (!confirm('¿Eliminar esta consulta? Esta acción no se puede deshacer.')) return;
+      const idx = state.consultations.findIndex(x => x.id === cid);
+      if (idx === -1) return alert('Consulta no encontrada.');
+      state.consultations.splice(idx, 1);
+      saveState();
+      renderPatientDetailPage(patientId);
+    });
   });
 }
 
